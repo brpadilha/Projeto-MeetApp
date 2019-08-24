@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import User from '../src/app/models/User';
+
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import authMiddleare from './app/middlewares/auth';
