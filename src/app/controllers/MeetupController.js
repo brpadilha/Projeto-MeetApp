@@ -3,6 +3,14 @@ import User from '../models/User';
 import * as Yup from 'yup';
 
 class MeetupController {
+	async index(req, res) {
+		const meetup = await Meetup.findAll({
+			where: {
+				canceled_at: null,
+			},
+		});
+		return res.json(meetup);
+	}
 	async store(req, res) {
 		const schema = Yup.object().shape({
 			provider_id: Yup.number().required(),
