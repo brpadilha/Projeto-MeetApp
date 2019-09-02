@@ -23,6 +23,10 @@ class User extends Model {
 		return this;
 	}
 
+	static associate(models) {
+		this.belongsTo(models.File, { foreignKey: 'archive_id', as: 'archive' });
+	}
+
 	checkPassword(password) {
 		return bcrypt.compare(password, this.password_hash); //compara se a senha que o usuário está logando é iguala  senha criptografada
 	}
