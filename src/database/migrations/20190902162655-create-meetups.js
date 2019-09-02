@@ -11,6 +11,18 @@ module.exports = {
 				autoIncrement: true,
 				primaryKey: true,
 			},
+			title: {
+				type: Sequelize.STRING,
+				allowNull: false,
+			},
+			description: {
+				type: Sequelize.STRING,
+				allowNull: false,
+			},
+			localization: {
+				type: Sequelize.STRING,
+				allowNull: false,
+			},
 			date: {
 				type: Sequelize.DATE,
 				allowNull: false,
