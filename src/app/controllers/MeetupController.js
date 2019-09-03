@@ -6,12 +6,16 @@ import * as Yup from 'yup';
 
 class MeetupController {
 	async index(req, res) {
+		const { page } = req.query;
+
 		const meetup = await Meetup.findAll({
 			where: {
 				canceled_at: null,
 			},
 			order: ['date'],
 			attributes: ['id', 'date', 'title', 'description', 'localization'],
+			limit: 20,
+			offset: (page - 1) * 20,
 			include: [
 				{
 					model: User,
