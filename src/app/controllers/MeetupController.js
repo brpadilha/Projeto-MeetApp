@@ -1,5 +1,6 @@
 import Meetup from '../models/Meetup';
 import User from '../models/User';
+import File from '../models/File';
 import { startOfHour, parseISO, isBefore } from 'date-fns';
 import * as Yup from 'yup';
 
@@ -9,6 +10,22 @@ class MeetupController {
 			where: {
 				canceled_at: null,
 			},
+			order: ['date'],
+			attributes: ['id', 'date', 'title', 'description', 'localization'],
+			include: [
+				{
+					model: User,
+					as: 'provider',
+					attributes: ['id', 'name'],
+					include: [
+						{
+							model: File,
+							as: 'photo',
+							attributes: ['id', 'path', 'url'],
+						},
+					],
+				},
+			],
 		});
 		return res.json(meetup);
 	}
