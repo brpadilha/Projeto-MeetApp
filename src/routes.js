@@ -9,6 +9,7 @@ import ArchiveController from './app/controllers/ArchiveController';
 import multerConfig from './config/multer';
 import multer from 'multer';
 import MeetupController from './app/controllers/MeetupController';
+import NotificationController from './app/controllers/NotificationController';
 
 const routes = new Router();
 const update = multer(multerConfig);
@@ -27,5 +28,7 @@ routes.get('/providers', ProviderController.index);
 
 routes.post('/meetups', MeetupController.store);
 routes.get('/meetups', MeetupController.index);
+
+routes.get('/notifications', NotificationController.index);
 
 export default routes;
