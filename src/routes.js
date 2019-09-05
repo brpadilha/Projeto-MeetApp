@@ -28,7 +28,9 @@ routes.get('/providers', ProviderController.index);
 
 routes.post('/meetups', MeetupController.store);
 routes.get('/meetups', MeetupController.index);
+routes.delete('/meetups/:id', MeetupController.delete);
 
 routes.get('/notifications', NotificationController.index);
+routes.put('/notifications', NotificationController.update);
 
 export default routes;

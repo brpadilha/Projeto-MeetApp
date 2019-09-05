@@ -1,10 +1,12 @@
 import Meetup from '../models/Meetup';
 import User from '../models/User';
 import File from '../models/File';
-import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import * as Yup from 'yup';
 import { pt } from 'date-fns/locale/pt';
 import Notification from '../schemas/Notification';
+
+import Mail from '../../lib/Mail';
 
 class MeetupController {
 	async index(req, res) {
@@ -103,6 +105,40 @@ class MeetupController {
 			user: provider_id,
 		});
 
+		return res.json(meetup);
+	}
+	async delete(req, res) {
+		const meetup = await Meetup.findByPk(req.params.id, {
+			include: [
+				{
+					model: User,
+					as: 'provider',
+					attributes: ['name', 'email'],
+				},
+			],
+		});
+
+		if (meetup.user_id !== req.userId) {
+			return res.status(401).json({
+				error: 'You don`t have permission to cancel this meetup',
+			});
+		}
+		const dateWithHour = subHours(Meetup.date, 2);
+
+		if (isBefore(dateWithHour, new Date())) {
+			return res
+				.status(401)
+				.json({ error: 'You can only cancel meetups 2 hour to advance.' });
+		}
+
+		meetup.canceled_at = new Date();
+		await meetup.save();
+
+		await Mail.sendMail({
+			to: `${meetup.provider.name} <${meetup.provider.email}>`,
+			subject: 'Agendamento para meetup cancelado',
+			text: 'Você tem um novo cancelamento',
+		});
 		return res.json(meetup);
 	}
 }
