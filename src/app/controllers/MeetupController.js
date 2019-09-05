@@ -114,7 +114,11 @@ class MeetupController {
 					model: User,
 					as: 'provider',
 					attributes: ['name', 'email'],
-				},
+				},{
+					model: User,
+					as: 'user',
+					attributes: ['name']
+				}
 			],
 		});
 
@@ -134,10 +138,17 @@ class MeetupController {
 		meetup.canceled_at = new Date();
 		await meetup.save();
 
-		await Mail.sendMail({
+		Mail.sendMail({
 			to: `${meetup.provider.name} <${meetup.provider.email}>`,
 			subject: 'Agendamento para meetup cancelado',
-			text: 'Você tem um novo cancelamento',
+			template: 'cancelation',
+			context: {
+				provider: meetup.provider.name,
+				user: meetup.user.name,
+				date: format(meetup.date, "'dia' dd 'de' MMMM', às' H:mm'h",{
+					locale: pt
+				})
+			}
 		});
 		return res.json(meetup);
 	}
