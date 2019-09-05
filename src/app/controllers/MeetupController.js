@@ -5,8 +5,9 @@ import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import * as Yup from 'yup';
 import { pt } from 'date-fns/locale/pt';
 import Notification from '../schemas/Notification';
-
 import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import CancellationMail from '../jobs/CancellationMail';
 
 class MeetupController {
 	async index(req, res) {
@@ -114,11 +115,12 @@ class MeetupController {
 					model: User,
 					as: 'provider',
 					attributes: ['name', 'email'],
-				},{
+				},
+				{
 					model: User,
 					as: 'user',
-					attributes: ['name']
-				}
+					attributes: ['name'],
+				},
 			],
 		});
 
@@ -137,18 +139,8 @@ class MeetupController {
 
 		meetup.canceled_at = new Date();
 		await meetup.save();
-
-		Mail.sendMail({
-			to: `${meetup.provider.name} <${meetup.provider.email}>`,
-			subject: 'Agendamento para meetup cancelado',
-			template: 'cancelation',
-			context: {
-				provider: meetup.provider.name,
-				user: meetup.user.name,
-				date: format(meetup.date, "'dia' dd 'de' MMMM', às' H:mm'h",{
-					locale: pt
-				})
-			}
+		await Queue.add(CancellationMail.key, {
+			meetup,
 		});
 		return res.json(meetup);
 	}
